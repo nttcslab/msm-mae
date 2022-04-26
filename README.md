@@ -4,11 +4,11 @@ This repository *will* offer implementation of our paper "Masked Spectrogram Mod
 
 ## To reviewers
 
-We will prepare the following contents shortly:
+We will release the following contents shortly:
 
 - Model implementations based on the [facebookresearch/mae](https://github.com/facebookresearch/mae).
 - Code for pre-training and evaluation.
 
-Our code will use two evaluation benchmarks:
-- [hear-eval-kit](https://github.com/neuralaudio/hear-eval-kit), an evaluation kit for HEAR 2021 NeurIPS competition.
-- [EVAR](https://github.com/nttcslab/eval-audio-repr), an evaluation package of audio representation.
+We hope our code to help further audio representation and application studies in the future. Thank you!
+
+![Under construction](https://freesvg.org/img/under-construction_geek_man_01.png)
