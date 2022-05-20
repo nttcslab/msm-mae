@@ -1,0 +1,21 @@
+# AR parameters such as FFT parameters.
+audio_repr: ar_msm_mae.AR_MSM_MAE
+weight_file: ../80x208p16x16_0422/checkpoint-100.pth
+feature_d: 3840
+sample_rate: 16000
+n_fft: 400
+window_size: 400
+hop_size: 160
+n_mels: 80
+f_min: 50
+f_max: 8000
+window: hanning
+
+# Model specific parameters
+norm_pix_loss: False
+
+# Training parameters.
+batch_size: 128
+lr_lineareval: 0.0003
+report_per_epochs: 20
+early_stop_epochs: 20
