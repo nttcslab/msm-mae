@@ -57,6 +57,63 @@ conda activate ar
 
 3. Install external modules listed on [requirements.txt](requirements.txt).
 
+### 1-1. Quick example
+
+We have a utility runtime model, RuntimeMAE, which helps you to load a pre-trained model and encode your audios.
+
+```python
+from msm_mae.runtime import RuntimeMAE
+
+device = torch.device('cuda')
+
+# Prepare your batch of audios. This is a dummy  example of three 10s  waves.
+batch_audio = 2 * torch.rand((3, 10 * 16000)) - 1.0 # input range = [-1., 1]
+batch_audio = batch_audio.to(device)
+
+# Create a model with pretrained weights.
+runtime = RuntimeMAE(weight_file='80x512p16x16_paper/checkpoint-100.pth')
+runtime = runtime.to(device)
+
+# Encode raw audio into features. `encode()` will process automatically:
+# 1. Convert the input `batch_audio` to log-mel spectrograms (LMS).
+# 2. Normalize the batch LMS with mean and std calculated from the batch.
+# 3. Encode to feature.
+frame_level = runtime.encode(batch_audio)
+
+# This example ends up with frame-level 3840-d feature vectors for 63 time frames.
+# The `frame_level` will have a size of torch.Size([3, 63, 3840]).
+print(frame_level.shape)
+
+#  You can get clip-level features by taking average of time franes.
+# The `clip_level` will have a size of torch.Size([3, 3840])
+clip_level = torch.mean(frame_level, dim=1)
+print(clip_level.shape)
+```
+
+To get the best features, you can normalize your audio with normalization statistics of your entire input data and use them in your pipeline.
+
+```python
+# Calculate statistics in advance. This is an example with 10 random waves.
+means, stds = [], []
+for _ in range(10):
+    lms = runtime.to_feature(torch.rand((10 * 16000)).to(device))
+    means.append(lms.mean())
+    stds.append(lms.std())
+dataset_mean, dataset_std = torch.mean(torch.stack(means)), torch.mean(torch.stack(stds))
+# These can be numbers [-5.4919195, 5.0389895], for example.
+
+# The followings are an example pipeline.
+
+# Convert your batch audios into LMS.
+batch_lms = runtime.to_feature(batch_audio)
+# Normalize them.
+batch_lms = (batch_lms - dataset_mean) / (dataset_std + torch.finfo().eps)
+# Encode them to feame-level features.
+frame_level = model.encode_lms(batch_lms)
+#  Calculate clip-level features if needed.
+clip_level = torch.mean(frame_level, dim=1)
+```
+
 ## 2. Evaluating MSM-MAE
 
 ### 2-1. Evaluating on HEAR 2021 NeurIPS Challenge Tasks
