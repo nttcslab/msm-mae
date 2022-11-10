@@ -25,6 +25,10 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 }
 ```
 
+### History
+
+UPDATE (Nov, 2022): We extended runtime inference `'encode_lms()'` to output features for each layer.
+
 ## 1. Getting Started
 
 The repository relies on the codes from [facebookresearch/mae](https://github.com/facebookresearch/mae), and we patch our changes on these files.
@@ -36,13 +40,11 @@ curl -o util/lars.py https://raw.githubusercontent.com/facebookresearch/mae/6a2b
 curl -o util/lr_decay.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/lr_decay.py
 curl -o util/lr_sched.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/lr_sched.py
 curl -o util/misc.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/misc.py
-curl -o util/pos_embed.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/pos_embed.py
+curl -o msm_mae/pos_embed.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/pos_embed.py
 curl -o main_pretrain.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/main_pretrain.py
 curl -o msm_mae/engine_pretrain.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/engine_pretrain.py
 curl -o msm_mae/models_mae.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/models_mae.py
-cd util
-patch -p1 < patch_util.diff
-cd ../msm_mae
+cd msm_mae
 patch -p1 < patch_msm_mae.diff
 cd ..
 patch -p1 < patch_main.diff
@@ -112,6 +114,20 @@ batch_lms = (batch_lms - dataset_mean) / (dataset_std + torch.finfo().eps)
 frame_level = model.encode_lms(batch_lms)
 #  Calculate clip-level features if needed.
 clip_level = torch.mean(frame_level, dim=1)
+```
+
+To get features per layer, you can add `return_layers=True`.
+
+```python
+# Getting features per layer.
+y = rt.encode_lms(torch.rand(10, 1, 80, 900), return_layers=True)
+print(len(y), y[0].shape)
+# --> 12 torch.Size([10, 57, 3840])
+
+# As normal, getting finale-layer features.
+y = rt.encode_lms(torch.rand(10, 1, 80, 900), return_layers=False)
+print(y.shape)
+# --> torch.Size([10, 57, 3840])
 ```
 
 ## 2. Evaluating MSM-MAE

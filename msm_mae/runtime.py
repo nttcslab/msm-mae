@@ -124,14 +124,7 @@ class RuntimeMAE(nn.Module):
         x = (x - mu) / sigma
         return x
 
-    def to_normalized_spec(self, batch_audio):
-        # raw -> spectrogram
-        x = self.to_feature(batch_audio)
-        # normalize among batch samples
-        x = self.normalize_batch(x)
-        return x
-
-    def encode_lms(self, lms):
+    def encode_lms(self, lms, return_layers=False):
         x = lms
 
         patch_fbins = self.backbone.grid_size()[0]
@@ -146,10 +139,22 @@ class RuntimeMAE(nn.Module):
         if True:
             # stack embeddings
             for i in range(x.shape[-1] // unit_frames):
-                emb, _, _ = self.backbone.forward_encoder(x[..., i*unit_frames:(i+1)*unit_frames], mask_ratio=0.)
+                emb, _, _ = self.backbone.forward_encoder(x[..., i*unit_frames:(i+1)*unit_frames], mask_ratio=0., return_layers=return_layers)
                 if self.backbone.use_cls_token:
-                    emb = emb[:, 1:, :]
-                emb = rearrange(emb, 'b (f t) d -> b t (f d)', f=patch_fbins, d=embed_d)
+                    emb = emb[..., 1:, :]
+                if len(emb.shape) > 3:
+                    emb = rearrange(emb, 'L b (f t) d -> L b t (f d)', f=patch_fbins, d=embed_d)
+                else:
+                    emb = rearrange(emb, 'b (f t) d -> b t (f d)', f=patch_fbins, d=embed_d)
+                embeddings.append(emb)
+        elif False:
+            # stack embeddings of all layers
+            for i in range(x.shape[-1] // unit_frames):
+                emb, _, _ = self.backbone.forward_encoder(x[..., i*unit_frames:(i+1)*unit_frames], mask_ratio=0., return_layers=True)
+                if self.backbone.use_cls_token:
+                    emb = emb[..., 1:, :]
+                emb = rearrange(emb, 'L b (f t) d -> L b t (f d)', f=patch_fbins, d=embed_d)
+                emb = rearrange(emb, 'L b t D -> b t (L D)')
                 embeddings.append(emb)
         elif False:
             # CLS only
@@ -166,13 +171,14 @@ class RuntimeMAE(nn.Module):
                 if self.backbone.use_cls_token:
                     emb = emb[:, 1:, :]
                 embeddings.append(emb)
-        x = torch.hstack(embeddings)
-        pad_emb_frames = int(embeddings[0].shape[1] * pad_frames / unit_frames)
+
+        x = torch.cat(embeddings, axis=-2)
+        pad_emb_frames = int(embeddings[0].shape[-2] * pad_frames / unit_frames)
         # print(2, x.shape, embeddings[0].shape, pad_emb_frames)
         if pad_emb_frames > 0:
-            x = x[:, :-pad_emb_frames] # remove padded tail
+            x = x[..., :-pad_emb_frames, :] # remove padded tail
         # print(3, x.shape)
-        return x
+        return x if len(emb.shape) == 3 else [x_ for x_ in x]
 
     def encode(self, batch_audio):
         x = self.to_normalized_spec(batch_audio)
