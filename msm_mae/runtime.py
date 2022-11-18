@@ -124,6 +124,13 @@ class RuntimeMAE(nn.Module):
         x = (x - mu) / sigma
         return x
 
+    def to_normalized_spec(self, batch_audio):
+        # raw -> spectrogram
+        x = self.to_feature(batch_audio)
+        # normalize among batch samples
+        x = self.normalize_batch(x)
+        return x
+
     def encode_lms(self, lms, return_layers=False):
         x = lms
 
