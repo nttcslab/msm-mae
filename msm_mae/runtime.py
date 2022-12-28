@@ -119,16 +119,18 @@ class RuntimeMAE(nn.Module):
         x = x.unsqueeze(1)
         return x
 
-    def normalize_batch(self, x):
+    def normalize_batch(self, x, return_stats=False):
         mu, sigma = x.mean(), x.std()
         x = (x - mu) / sigma
+        if return_stats:
+            return x, (mu, sigma)
         return x
 
-    def to_normalized_spec(self, batch_audio):
+    def to_normalized_spec(self, batch_audio, return_stats=False):
         # raw -> spectrogram
         x = self.to_feature(batch_audio)
         # normalize among batch samples
-        x = self.normalize_batch(x)
+        x = self.normalize_batch(x, return_stats=return_stats)
         return x
 
     def encode_lms(self, lms, return_layers=False):
