@@ -27,7 +27,8 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 
 ### History
 
-UPDATE (Nov, 2022): We extended runtime inference `'encode_lms()'` to output features for each layer.
+- UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!? 
+- UPDATE (Nov, 2022): Extended runtime inference `'encode_lms()'` to output features for each layer.
 
 ## 1. Getting Started
 
@@ -276,21 +277,27 @@ The training loop takes two actions for evaluating checkpoints during training: 
     </tr></tbody></table>
 
 
-## 4. Visualization Examples
+## 4. Visualization & Audio Examples
 
-👉 An [example notebook](misc/Note_visualization.ipynb) is available. 👈
+👉 [Visualization example notebook](misc/Note_visualization.ipynb) and [Vizualization & Audio example notebook](Note_viz_and_play_reconstruction.ipynb) are available. 👈
 
-You can try visualizations of reconstruction results as well as attention maps.
+The [Visualization example notebook](misc/Note_visualization.ipynb) shows how to visualize reconstruction results as well as attention maps.
 
 - Download `AudioSetWav16k_examples.zip` that contains example wave samples from the [releases](https://github.com/nttcslab/msm-mae/releases) and unzip the zip file in the `misc` folder beforehand.
 
-A reconstruction examples:
+Here are reconstruction examples:
 
 ![recon512](misc/recon_example1.png)
 
-An attention map examples:
+Here are attention map examples:
 
 ![attn512](misc/attn_example3.png)
+
+In addition, [Vizualization & Audio example notebook](Note_viz_and_play_reconstruction.ipynb) shows how we can invert these log-mel spectrograms to audios using [librosa.feature.inverse.mel_to_audio](https://librosa.org/doc/main/generated/librosa.feature.inverse.mel_to_audio.html). Two examples from the notebook follow:
+
+- 📣 [Sound1 Input](misc/Sound1-input.wav) → 📣 [Reconstruction](misc/Sound1-recon.wav)
+- 📣 [Sound2 Input](misc/Sound2-input.wav) → 📣 [Reconstruction](misc/Sound2-recon.wav)
+
 
 ## 5. Pre-trainede Weights and Network Structure Details
 
