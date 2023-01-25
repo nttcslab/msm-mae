@@ -25,6 +25,11 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 }
 ```
 
+### History
+
+- UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!? 
+- UPDATE (Nov, 2022): Extended runtime inference `'encode_lms()'` to output features for each layer.
+
 ## 1. Getting Started
 
 The repository relies on the codes from [facebookresearch/mae](https://github.com/facebookresearch/mae), and we patch our changes on these files.
@@ -36,13 +41,11 @@ curl -o util/lars.py https://raw.githubusercontent.com/facebookresearch/mae/6a2b
 curl -o util/lr_decay.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/lr_decay.py
 curl -o util/lr_sched.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/lr_sched.py
 curl -o util/misc.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/misc.py
-curl -o util/pos_embed.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/pos_embed.py
+curl -o msm_mae/pos_embed.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/util/pos_embed.py
 curl -o main_pretrain.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/main_pretrain.py
 curl -o msm_mae/engine_pretrain.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/engine_pretrain.py
 curl -o msm_mae/models_mae.py https://raw.githubusercontent.com/facebookresearch/mae/6a2ba402291005b003a70e99f7c87d1a2c376b0d/models_mae.py
-cd util
-patch -p1 < patch_util.diff
-cd ../msm_mae
+cd msm_mae
 patch -p1 < patch_msm_mae.diff
 cd ..
 patch -p1 < patch_main.diff
@@ -56,6 +59,77 @@ conda activate ar
 ```
 
 3. Install external modules listed on [requirements.txt](requirements.txt).
+
+### 1-1. Quick example
+
+We have a utility runtime model, RuntimeMAE, which helps you to load a pre-trained model and encode your audios.
+
+```python
+from msm_mae.runtime import RuntimeMAE
+
+device = torch.device('cuda')
+
+# Prepare your batch of audios. This is a dummy  example of three 10s  waves.
+batch_audio = 2 * torch.rand((3, 10 * 16000)) - 1.0 # input range = [-1., 1]
+batch_audio = batch_audio.to(device)
+
+# Create a model with pretrained weights.
+runtime = RuntimeMAE(weight_file='80x512p16x16_paper/checkpoint-100.pth')
+runtime = runtime.to(device)
+
+# Encode raw audio into features. `encode()` will process automatically:
+# 1. Convert the input `batch_audio` to log-mel spectrograms (LMS).
+# 2. Normalize the batch LMS with mean and std calculated from the batch.
+# 3. Encode to feature.
+frame_level = runtime.encode(batch_audio)
+
+# This example ends up with frame-level 3840-d feature vectors for 63 time frames.
+# The `frame_level` will have a size of torch.Size([3, 63, 3840]).
+print(frame_level.shape)
+
+#  You can get clip-level features by taking average of time franes.
+# The `clip_level` will have a size of torch.Size([3, 3840])
+clip_level = torch.mean(frame_level, dim=1)
+print(clip_level.shape)
+```
+
+To get the best features, you can normalize your audio with normalization statistics of your entire input data and use them in your pipeline.
+
+```python
+# Calculate statistics in advance. This is an example with 10 random waves.
+means, stds = [], []
+for _ in range(10):
+    lms = runtime.to_feature(torch.rand((10 * 16000)).to(device))
+    means.append(lms.mean())
+    stds.append(lms.std())
+dataset_mean, dataset_std = torch.mean(torch.stack(means)), torch.mean(torch.stack(stds))
+# These can be numbers [-5.4919195, 5.0389895], for example.
+
+# The followings are an example pipeline.
+
+# Convert your batch audios into LMS.
+batch_lms = runtime.to_feature(batch_audio)
+# Normalize them.
+batch_lms = (batch_lms - dataset_mean) / (dataset_std + torch.finfo().eps)
+# Encode them to feame-level features.
+frame_level = model.encode_lms(batch_lms)
+#  Calculate clip-level features if needed.
+clip_level = torch.mean(frame_level, dim=1)
+```
+
+To get features per layer, you can add `return_layers=True`.
+
+```python
+# Getting features per layer.
+y = rt.encode_lms(torch.rand(10, 1, 80, 900), return_layers=True)
+print(len(y), y[0].shape)
+# --> 12 torch.Size([10, 57, 3840])
+
+# As normal, getting finale-layer features.
+y = rt.encode_lms(torch.rand(10, 1, 80, 900), return_layers=False)
+print(y.shape)
+# --> torch.Size([10, 57, 3840])
+```
 
 ## 2. Evaluating MSM-MAE
 
@@ -203,21 +277,27 @@ The training loop takes two actions for evaluating checkpoints during training: 
     </tr></tbody></table>
 
 
-## 4. Visualization Examples
+## 4. Visualization & Audio Examples
 
-👉 An [example notebook](misc/Note_visualization.ipynb) is available. 👈
+👉 [Visualization example notebook](misc/Note_visualization.ipynb) and [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb) are available. 👈
 
-You can try visualizations of reconstruction results as well as attention maps.
+The [Visualization example notebook](misc/Note_visualization.ipynb) shows how to visualize reconstruction results as well as attention maps.
 
 - Download `AudioSetWav16k_examples.zip` that contains example wave samples from the [releases](https://github.com/nttcslab/msm-mae/releases) and unzip the zip file in the `misc` folder beforehand.
 
-A reconstruction examples:
+Here are reconstruction examples:
 
 ![recon512](misc/recon_example1.png)
 
-An attention map examples:
+Here are attention map examples:
 
 ![attn512](misc/attn_example3.png)
+
+In addition, [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb) shows how we can invert these log-mel spectrograms to audios using [librosa.feature.inverse.mel_to_audio](https://librosa.org/doc/main/generated/librosa.feature.inverse.mel_to_audio.html). Two examples from the notebook follow:
+
+- 📣 [Sound1 Input](misc/Sound1-input.wav) → 📣 [Reconstruction](misc/Sound1-recon.wav)
+- 📣 [Sound2 Input](misc/Sound2-input.wav) → 📣 [Reconstruction](misc/Sound2-recon.wav)
+
 
 ## 5. Pre-trainede Weights and Network Structure Details
 
