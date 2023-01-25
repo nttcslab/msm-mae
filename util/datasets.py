@@ -71,6 +71,7 @@ class SpectrogramDataset(torch.utils.data.Dataset):
         self.norm_stats = norm_stats
 
         logging.info(f'Dataset contains {len(self.df)} files with a normalizing stats {self.norm_stats}.')
+        print(f'Dataset contains {len(self.df)} files with a normalizing stats {self.norm_stats}.')
 
     def __len__(self):
         return len(self.df)
@@ -141,6 +142,8 @@ def build_dataset(cfg):
 
 def build_viz_dataset(cfg):
     files = [str(f).replace(str(cfg.data_path) + '/', '') for f in sorted(Path(cfg.data_path).glob('vis_samples/*.npy'))]
+    if len(files) == 0:
+        return None, files
     norm_stats = cfg.norm_stats if 'norm_stats' in cfg else None
     ds = SpectrogramDataset(folder=cfg.data_path, files=files, crop_frames=cfg.input_size[1], tfms=None, norm_stats=norm_stats)
     return ds, files

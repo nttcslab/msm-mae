@@ -86,11 +86,11 @@ def get_to_melspec(cfg):
     return to_spec
 
 
-def get_timestamps(cfg, batch_audio, x):
+def get_timestamps(cfg, batch_audio, x): # Returns timestamps in milliseconds.
     audio_len = len(batch_audio[0])
     sec = audio_len / cfg.sample_rate
     x_len = len(x[0])
-    step = sec / x_len
+    step = sec / x_len * 1000 # sec -> ms
     ts = torch.tensor([step * i for i in range(x_len)]).unsqueeze(0)
     ts = ts.repeat(len(batch_audio), 1)
     return ts
