@@ -13,20 +13,25 @@ a self-supervised learning method for general-purpose audio representation, incl
 If you find MSM-MAE useful in your research, please use the following BibTeX entry for citation.
 
 ```BibTeX
-@article{niizumi2022masked,
-    title   = {Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation}, 
-    author  = {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
-    journal = {arXiv:2204.12260},
-    year    = {2022},
-    eprint  = {2204.12260},
-    url     = {https://arxiv.org/abs/2204.12260},
-    archivePrefix = {arXiv},
-    primaryClass = {eess.AS}
+@InProceedings{niizumi2022masked,
+    title     = {Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation},
+    author    = {Niizumi, Daisuke and Takeuchi, Daiki and Ohishi, Yasunori and Harada, Noboru and Kashino, Kunio},
+    booktitle = {HEAR: Holistic Evaluation of Audio Representations (NeurIPS 2021 Competition)},
+    pages     = {1--24},
+    year      = {2022},
+    editor    = {Turian, Joseph and Schuller, Björn W. and Herremans, Dorien and Kirchoff, Katrin and Perera, Paola Garcia and Esling, Philippe},
+    volume    = {166},
+    series    = {Proceedings of Machine Learning Research},
+    month     = {13--14 Dec},
+    publisher = {PMLR},
+    pdf       = {https://proceedings.mlr.press/v166/niizumi22a/niizumi22a.pdf},
+    url       = {https://proceedings.mlr.press/v166/niizumi22a.html}
 }
 ```
 
 ### History
 
+- UPDATE (Jan, 2023): [PMLR paper](https://proceedings.mlr.press/v166/niizumi22a.html) is out. Replaced BibTeX and URL links with the PMLR website. Also fixed [a bug](https://github.com/nttcslab/msm-mae/issues/2).
 - UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!? 
 - UPDATE (Nov, 2022): Extended runtime inference `'encode_lms()'` to output features for each layer.
 
@@ -135,7 +140,7 @@ print(y.shape)
 
 ### 2-1. Evaluating on HEAR 2021 NeurIPS Challenge Tasks
 
-We evaluate our models on [our paper](https://arxiv.org/abs/2204.12260) using [hear-eval-kit](https://github.com/neuralaudio/hear-eval-kit) from on [HEAR 2021 NeurIPS Challenge](https://arxiv.org/abs/2203.03022) as follows.
+We evaluate our models on [our paper](https://proceedings.mlr.press/v166/niizumi22a.html) using [hear-eval-kit](https://github.com/neuralaudio/hear-eval-kit) from on [HEAR 2021 NeurIPS Challenge](https://arxiv.org/abs/2203.03022) as follows.
 
 NOTE: The folder `hear` has all the files we need to evaluate models on hear-eval-kit.
 
@@ -340,7 +345,7 @@ We appreciate these publicly available implementations and all the modules our e
 ## References
 
 - MAE: *[Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick "Masked Autoencoders Are Scalable Vision Learners," 2021](https://arxiv.org/abs/2111.06377).*
-- MSM-MAE: *[Daisuke Niizumi, Daiki Takeuchi, Yasunori Ohishi, Noboru Harada, and Kunio Kashino "Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation," 2022](https://arxiv.org/abs/2204.12260).*
+- MSM-MAE: *[Daisuke Niizumi, Daiki Takeuchi, Yasunori Ohishi, Noboru Harada, and Kunio Kashino "Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation," 2022](https://proceedings.mlr.press/v166/niizumi22a.html), [(arxiv)](https://arxiv.org/abs/2204.12260).*
 - BEiT: *[Hangbo Bao, Li Dong, and Furu Wei "BEiT: BERT Pre-Training of Image Transformers," 2021](https://arxiv.org/abs/2106.08254).*
-- HEAR 2021: *[Joseph Turian, Jordie Shier, Humair Raj Khan, Bhiksha Raj, Björn W. Schuller, Christian J. Steinmetz, Colin Malloy, George Tzanetakis, Gissel Velarde, Kirk McNally, Max Henry, Nicolas Pinto, Camille Noufi, Christian Clough, Dorien Herremans, Eduardo Fonseca, Jesse Engel, Justin Salamon, Philippe Esling, Pranay Manocha, Shinji Watanabe, Zeyu Jin, and Yonatan Bisk "HEAR 2021: Holistic Evaluation of Audio Representations," 2022](https://arxiv.org/abs/2203.03022).*
+- HEAR 2021: *[Joseph Turian, Jordie Shier, Humair Raj Khan, Bhiksha Raj, Björn W. Schuller, Christian J. Steinmetz, Colin Malloy, George Tzanetakis, Gissel Velarde, Kirk McNally, Max Henry, Nicolas Pinto, Camille Noufi, Christian Clough, Dorien Herremans, Eduardo Fonseca, Jesse Engel, Justin Salamon, Philippe Esling, Pranay Manocha, Shinji Watanabe, Zeyu Jin, and Yonatan Bisk "HEAR 2021: Holistic Evaluation of Audio Representations," 2022](https://proceedings.mlr.press/v176/turian22a.html), [(arxiv)](https://arxiv.org/abs/2203.03022).*
 - FSD50K: *[Eduardo Fonseca and Xavier Favory and Jordi Pons and Frederic Font and Xavier Serra, “FSD50K: an Open Dataset of Human-Labeled Sound Events,” 2020](https://arxiv.org/abs/2010.00475).*
