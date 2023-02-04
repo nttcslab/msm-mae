@@ -12,6 +12,7 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 import nnAudio.Spectrogram
+import librosa
 
 from . import models_mae
 
@@ -215,7 +216,6 @@ class RuntimeMAE(nn.Module):
         print(audio.shape, x.shape, ts.shape)
         return x, ts
 
-
     def get_basic_timestamp_embeddings(self, audio):
         """
         audio: n_sounds x n_samples of mono audio in the range [-1, 1]. All sounds in a batch will be padded/trimmed to the same length.
@@ -225,3 +225,30 @@ class RuntimeMAE(nn.Module):
         """
         assert False, 'return get_basic_timestamp_embeddings(audio, model)'
 
+    def reconstruct(self, lms, mask_ratio, start_frame=0):
+        """A helper function to get reconstruction results.
+        Use `lms_to_wav` if you may also want to convert the reconstruction results to wavs.
+        **Note** this does *not* process the entire LMS frames but rather crops them from the start_frame with the duration of the model's unit frame.
+        """
+
+        # trim frames
+        unit_frames = self.backbone.patch_embed.img_size[1]
+        last_frame = start_frame + unit_frames
+        lms_cropped = lms[..., start_frame:last_frame]
+        # raw reconstruction
+        with torch.no_grad():
+            loss, recons, errormap, mask = self.backbone.forward_viz(lms_cropped, mask_ratio)
+
+        return loss, lms_cropped, recons, errormap, mask
+
+
+    def lms_to_wav(self, single_lms, norm_stats, sr=16000, n_fft=400, hop_length=160, win_length=400):
+        """A helper function to revert an LMS into an audio waveform.
+        Be sure to use the normalization statistics you used to normalize the LMS.
+        """
+
+        mu, sigma = norm_stats
+        M = (single_lms*sigma + mu).exp().numpy()
+        wav = librosa.feature.inverse.mel_to_audio(M, sr=sr, n_fft=n_fft, hop_length=hop_length, win_length=win_length)
+        # display(Audio(wav, rate=sr))
+        return wav
