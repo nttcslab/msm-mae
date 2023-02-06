@@ -241,10 +241,23 @@ class RuntimeMAE(nn.Module):
 
         return loss, lms_cropped, recons, errormap, mask
 
+    def decode_to_lms(self, lms_all):
+        """Decode the embeddings into LMS.
+
+        Note: To be very strict, we cannot guarantee that the decoder can reconstruct visible patch embeddings to the original LMS space
+        because the training does not calculate the loss on the reconstruction result of the visible patches. Since the loss is only calculated on the masked tokens,
+        the decoder learns to predict the original input patches of the masked tokens using the visible patch tokens.
+        """
+        ids_restore = torch.tensor(list(range(lms_all.shape[-2] - 1))).repeat(lms_all.shape[0], 1)
+        with torch.no_grad():
+            preds = self.backbone.forward_decoder(lms_all, ids_restore)
+        decoded = self.backbone.unpatchify(preds)
+        return decoded
 
     def lms_to_wav(self, single_lms, norm_stats, sr=16000, n_fft=400, hop_length=160, win_length=400):
         """A helper function to revert an LMS into an audio waveform.
-        Be sure to use the normalization statistics you used to normalize the LMS.
+
+        CAUTION: Be sure to use the normalization statistics you used to normalize the LMS.
         """
 
         mu, sigma = norm_stats
