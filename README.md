@@ -29,8 +29,20 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 }
 ```
 
+### **New Method Notice (ICASSP2023)**
+
+We propose a new method [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d), in the coming [ICASSP2023](https://2023.ieeeicassp.org/). Please check it out if you are looking for a more performing model. M2D is different from MSM-MAE with regard to the followings:
+
+- M2D does not employ the reconstruction task, which calculates the loss in input space; instead, it calculates the loss in the feature space, using a momentum encoder to encode masked patches into features.
+- M2D performs better than MSM-MAE.
+
+In short, if you want a better audio representation, please try M2D. If you want to try masked reconstruction, MSM-MAE is for you.
+
+*** [Link to the repository of the Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d) ***
+
 ### History
 
+- UPDATE (Apr, 2023): [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d) is linked to this repository.
 - UPDATE (Jan, 2023): [PMLR paper](https://proceedings.mlr.press/v166/niizumi22a.html) is out. Replaced BibTeX and URL links with the PMLR website. Also fixed [a bug](https://github.com/nttcslab/msm-mae/issues/2).
 - UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!? 
 - UPDATE (Nov, 2022): Extended runtime inference `'encode_lms()'` to output features for each layer.
