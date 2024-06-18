@@ -29,9 +29,15 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 }
 ```
 
-### **New Method Notice (ICASSP2023)**
+### **New Results in TASLP(2024) & INTERSPEECH 2024**
 
-We propose a new method [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d), in the coming [ICASSP2023](https://2023.ieeeicassp.org/). Please check it out if you are looking for a more performing model. M2D is different from MSM-MAE with regard to the followings:
+[Masked Modeling Duo (M2D) in TASLP](https://ieeexplore.ieee.org/document/10502167) and [M2D-CLAP to appear at INTERSPEECH 2024](https://arxiv.org/abs/2406.02032) show the even improved results. Please check out the details.
+
+![new results](misc/new-results-on-m2d-paper.png)
+
+### **New Method Notice TASLP(2024) & ICASSP 2023**
+
+We proposed a new method [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d), in [TASLP](https://ieeexplore.ieee.org/document/10502167) and the [ICASSP2023](https://ieeexplore.ieee.org/document/10097236). Please check it out if you are looking for a more performing model. M2D is different from MSM-MAE with regard to the following:
 
 - M2D does not employ the reconstruction task, which calculates the loss in input space; instead, it calculates the loss in the feature space, using a momentum encoder to encode masked patches into features.
 - M2D performs better than MSM-MAE.
