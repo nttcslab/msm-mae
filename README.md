@@ -1,9 +1,37 @@
 ![key_visual](misc/key-visual-msm-mae.png)
 
-# Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation
+# Masked Spectrogram Modeling using Masked Autoencoders (MSM-MAE)
 
-This is a demo implementation of Masked Spectrogram Modeling using Masked Autoencoders (MSM-MAE),
-a self-supervised learning method for general-purpose audio representation, includes:
+> 🚨 **Important Notice: A newer, better implementation is available.** 🚨
+>
+> 🎉 The successor to this repository, **[Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d)**, is now available.
+> **If you are starting a new project, please use M2D instead of this repository.**
+>
+> - 🏆 **M2D pre-trained weights significantly outperform those provided here.** See the results below.
+> - 📦 **The M2D repository also distributes MSM-MAE pre-trained weights**, and they significantly outperform the weights in this repository—even as MSM-MAE models.
+> - 🔁 **M2D supports training MSM-MAE models** as well as M2D models.
+> - 🗂️ This repository remains available as the reference implementation accompanying the original MSM-MAE paper.
+>
+> 👉 **[Go to the M2D repository: https://github.com/nttcslab/m2d](https://github.com/nttcslab/m2d)** 👈
+
+## 🤔 Why M2D?
+
+The table below compares EVAR benchmark results between MSM-MAE (this repository) and M2D models. M2D consistently and substantially outperforms MSM-MAE across all tasks.
+
+![new results](misc/new-results-on-m2d-paper.png)
+
+M2D improves upon MSM-MAE in two key ways:
+
+- 🧠 Instead of reconstructing masked patches in input space, M2D computes the loss in **feature space** using a momentum encoder—leading to richer representations.
+- 📈 M2D achieves **higher scores across all downstream tasks** evaluated in our papers.
+
+For training MSM-MAE-style models, M2D's codebase supports MSM-MAE training as well, so there is no reason to use this older implementation for new work. 🙌
+
+---
+
+## About This Repository (Reference / Archive)
+
+This repository is the original implementation of **Masked Spectrogram Modeling using Masked Autoencoders (MSM-MAE)**, a self-supervised learning method for general-purpose audio representation. It includes:
 
 - Training code that can pre-train models with arbitrary audio files.
 - Evaluation code to test models under two benchmarks, [HEAR 2021](https://arxiv.org/abs/2203.03022) and [EVAR](https://github.com/nttcslab/eval-audio-repr).
@@ -29,29 +57,14 @@ If you find MSM-MAE useful in your research, please use the following BibTeX ent
 }
 ```
 
-### **New Results in TASLP(2024) & INTERSPEECH 2024**
-
-[Masked Modeling Duo (M2D) in TASLP](https://ieeexplore.ieee.org/document/10502167) and [M2D-CLAP to appear at INTERSPEECH 2024](https://arxiv.org/abs/2406.02032) show the even improved results. Please check out the details.
-
-![new results](misc/new-results-on-m2d-paper.png)
-
-### **New Method Notice TASLP(2024) & ICASSP 2023**
-
-We proposed a new method [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d), in [TASLP](https://ieeexplore.ieee.org/document/10502167) and the [ICASSP2023](https://ieeexplore.ieee.org/document/10097236). Please check it out if you are looking for a more performing model. M2D is different from MSM-MAE with regard to the following:
-
-- M2D does not employ the reconstruction task, which calculates the loss in input space; instead, it calculates the loss in the feature space, using a momentum encoder to encode masked patches into features.
-- M2D performs better than MSM-MAE.
-
-In short, if you want a better audio representation, please try M2D. If you want to try masked reconstruction, MSM-MAE is for you.
-
-*** [Link to the repository of the Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d) ***
-
 ### History
 
 - UPDATE (Apr, 2023): [Masked Modeling Duo (M2D)](https://github.com/nttcslab/m2d) is linked to this repository.
 - UPDATE (Jan, 2023): [PMLR paper](https://proceedings.mlr.press/v166/niizumi22a.html) is out. Replaced BibTeX and URL links with the PMLR website. Also fixed [a bug](https://github.com/nttcslab/msm-mae/issues/2).
-- UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!? 
+- UPDATE (Dec, 2022): Added [Vizualization & Audio example notebook](misc/Note_viz_and_play_reconstruction.ipynb). Now we can listen 👂 to how the reconstruction results sound!?
 - UPDATE (Nov, 2022): Extended runtime inference `'encode_lms()'` to output features for each layer.
+
+---
 
 ## 1. Getting Started
 
@@ -322,7 +335,7 @@ In addition, [Vizualization & Audio example notebook](misc/Note_viz_and_play_rec
 - 📣 [Sound2 Input](misc/Sound2-input.wav) → 📣 [Reconstruction](misc/Sound2-recon.wav)
 
 
-## 5. Pre-trainede Weights and Network Structure Details
+## 5. Pre-trained Weights and Network Structure Details
 
 Three pre-trained weights are published on the [releases](https://github.com/nttcslab/msm-mae/releases),
 and the followings are their EVAR task results:
@@ -362,8 +375,8 @@ We appreciate these publicly available implementations and all the modules our e
 
 ## References
 
-- MAE: *[Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick "Masked Autoencoders Are Scalable Vision Learners," 2021](https://arxiv.org/abs/2111.06377).*
-- MSM-MAE: *[Daisuke Niizumi, Daiki Takeuchi, Yasunori Ohishi, Noboru Harada, and Kunio Kashino "Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation," 2022](https://proceedings.mlr.press/v166/niizumi22a.html), [(arxiv)](https://arxiv.org/abs/2204.12260).*
-- BEiT: *[Hangbo Bao, Li Dong, and Furu Wei "BEiT: BERT Pre-Training of Image Transformers," 2021](https://arxiv.org/abs/2106.08254).*
+- MAE: *[Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick "Masked Autoencoders Are Scalable Vision Learners," in Proc. CVPR, June 2022, pp. 16000–16009.](https://ieeexplore.ieee.org/document/9879206).*
+- MSM-MAE: *[Daisuke Niizumi, Daiki Takeuchi, Yasunori Ohishi, Noboru Harada, and Kunio Kashino "Masked Spectrogram Modeling using Masked Autoencoders for Learning General-purpose Audio Representation," in Proc. HEAR: Holistic Evaluation of Audio Representations (NeurIPS 2021 Competition), PMLR 166:1-24, 2022](https://proceedings.mlr.press/v166/niizumi22a.html), [(arxiv)](https://arxiv.org/abs/2204.12260).*
+- BEiT: *[Hangbo Bao, Li Dong, and Furu Wei "BEiT: BERT Pre-Training of Image Transformers," in Proc. ICLR, 2022](https://openreview.net/forum?id=p-BhZSz59o4).*
 - HEAR 2021: *[Joseph Turian, Jordie Shier, Humair Raj Khan, Bhiksha Raj, Björn W. Schuller, Christian J. Steinmetz, Colin Malloy, George Tzanetakis, Gissel Velarde, Kirk McNally, Max Henry, Nicolas Pinto, Camille Noufi, Christian Clough, Dorien Herremans, Eduardo Fonseca, Jesse Engel, Justin Salamon, Philippe Esling, Pranay Manocha, Shinji Watanabe, Zeyu Jin, and Yonatan Bisk "HEAR 2021: Holistic Evaluation of Audio Representations," 2022](https://proceedings.mlr.press/v176/turian22a.html), [(arxiv)](https://arxiv.org/abs/2203.03022).*
-- FSD50K: *[Eduardo Fonseca and Xavier Favory and Jordi Pons and Frederic Font and Xavier Serra, “FSD50K: an Open Dataset of Human-Labeled Sound Events,” 2020](https://arxiv.org/abs/2010.00475).*
+- FSD50K: *[Eduardo Fonseca and Xavier Favory and Jordi Pons and Frederic Font and Xavier Serra, "FSD50K: an Open Dataset of Human-Labeled Sound Events," TASLP, vol. 30, pp. 829-852, 2022](https://ieeexplore.ieee.org/document/9645159).*
